@@ -73,6 +73,51 @@
         <delete file="${ewok.basedir}/biserver-ee"/>-->
     </target>
 
+
+
+    <target name="ewok-build-platform-local" description="Puts libraries in platform zip">
+        <!--BI server-->
+
+        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
+        <echo message="Deleting old jars and plugins"/>
+        <delete>
+            <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
+                <include name="pentaho-solutions/system/reporting"/>
+                <include name="pentaho-solutions/system/common-ui"/>
+                <include name="pentaho-solutions/system/pentaho-interactive-reporting"/>
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
+            </fileset>
+        </delete>
+        <echo message="Copying jars"/>
+        <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
+            <fileset dir="${ewok.basedir}/">
+                <include name="${ewok.reporting.core.jar}"/>
+                <include name="${ewok.reporting-plugin.jar}"/>
+            </fileset>
+        </copy>
+        <echo message="Unzipping plugins"/>
+        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
+            <fileset dir="${ewok.basedir}/">
+                <include name="${ewok.reporting-plugin.zip}"/>
+                <include name="${ewok.interactive-reporting-plugin.zip}"/>
+                <include name="${ewok.common-ui-plugin.zip}"/>
+            </fileset>
+        </unzip>
+        <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
+        <!--<zip basedir="${ewok.basedir}/biserver-ee" zipfile="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
+        <delete file="${ewok.basedir}/biserver-ee"/>-->
+    </target>
+
     <target name="ewok" depends="clean, ewok-resolve-lib, ewok-build-platform"
+            description="Downloads libraries, unzips platform and puts libraries in"/>
+
+    <target name="ewok-local" depends="clean, ewok-build-platform-local"
             description="Downloads libraries, unzips platform and puts libraries in"/>
 </project>
