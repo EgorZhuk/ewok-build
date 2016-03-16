@@ -71,11 +71,12 @@
         <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
     </target>
 
+    <target name="copy-platform">
+        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
+    </target>
 
     <target name="ewok-build-platform-local" description="Puts libraries in platform zip">
         <!--BI server-->
-
-        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
         <echo message="Deleting old jars and plugins"/>
         <delete>
             <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
@@ -109,7 +110,7 @@
     <target name="ewok" depends="clean, ewok-resolve-lib, ewok-build-platform"
             description="Downloads libraries, unzips platform and puts libraries in"/>
 
-    <target name="ewok-local" depends="clean, ewok-build-platform-local"
+    <target name="ewok-local" depends="clean, copy-platform, ewok-build-platform-local"
             description="Downloads libraries, unzips platform and puts libraries in"/>
 
     <target name="debug">
