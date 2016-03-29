@@ -8,7 +8,7 @@
         <delete dir="${ewok.basedir}"/>
     </target>
 
-    <target name="ewok-resolve-lib"
+    <target name="resolve"
             description="Removes old and downloads latest core, reporting plugin, pir, common-ui">
         <mkdir dir="${ewok.basedir}/"/>
         <delete>
@@ -18,6 +18,7 @@
                 <include name="pentaho-reporting-engine-classic-core-platform-plugin-package-${ewok.version}.zip"/>
                 <include name="pir-plugin-ee-${ewok.version}-dev.zip"/>
                 <include name="common-ui-${ewok.version}.zip"/>
+                <include name="pentaho-user-console-package-${ewok.version}.zip"/>
             </fileset>
         </delete>
         <get src="${ewok.reporting.core.jar.url}" description="Reporting core jar"
@@ -30,10 +31,12 @@
              dest="${ewok.basedir}/pir-plugin-ee-${ewok.version}-dev.zip"/>
         <get src="${ewok.common-ui-plugin.zip.url}" description="Common ui zip"
              dest="${ewok.basedir}/common-ui-${ewok.version}.zip"/>
+        <get src="${ewok.puc.zip.url}" description="PUC zip"
+             dest="${ewok.basedir}/pentaho-user-console-package-${ewok.version}.zip"/>
     </target>
 
 
-    <target name="ewok-build-platform" description="Puts libraries in platform zip">
+    <target name="build" description="Puts libraries in platform zip">
         <!--BI server-->
 
         <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
@@ -51,6 +54,10 @@
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
                 <include
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
+                <include
+                        name="tomcat/webapps/pentaho/mantle/"/>
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/deploy/"/>
             </fileset>
         </delete>
         <echo message="Copying jars"/>
@@ -68,6 +75,9 @@
                 <include name="common-ui-${ewok.version}.zip"/>
             </fileset>
         </unzip>
+        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/">
+            <file name="${ewok.basedir}/pentaho-user-console-package-${ewok.version}.zip"/>
+        </unzip>
         <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
     </target>
 
@@ -75,7 +85,7 @@
         <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
     </target>
 
-    <target name="ewok-build-platform-local" description="Puts libraries in platform zip">
+    <target name="build-local" description="Puts libraries in platform zip">
         <!--BI server-->
         <echo message="Deleting old jars and plugins"/>
         <delete>
@@ -107,10 +117,30 @@
         <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
     </target>
 
-    <target name="ewok" depends="clean, ewok-resolve-lib, ewok-build-platform"
+    <target name="puc">
+        <delete>
+            <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
+                <include name="pentaho-solutions/system/reporting"/>
+
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
+
+                <include
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
+            </fileset>
+        </delete>
+        <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
+            <file name="${ewok.reporting-plugin.jar}"/>
+        </copy>
+        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
+            <file name="${ewok.reporting-plugin.zip}"/>
+        </unzip>
+    </target>
+
+    <target name="ewok" depends="clean, resolve, build"
             description="Downloads libraries, unzips platform and puts libraries in"/>
 
-    <target name="ewok-local" depends="clean, copy-platform, ewok-build-platform-local"
+    <target name="ewok-local" depends="clean, copy-platform, build-local"
             description="Downloads libraries, unzips platform and puts libraries in"/>
 
     <target name="debug">
