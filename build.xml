@@ -33,6 +33,8 @@
              dest="${ewok.basedir}/common-ui-${ewok.version}.zip"/>
         <get src="${ewok.puc.zip.url}" description="PUC zip"
              dest="${ewok.basedir}/pentaho-user-console-package-${ewok.version}.zip"/>
+        <get src="${ewok.dd.zip.url}" description="Dashboard zip"
+             dest="${ewok.basedir}/pdd-plugin-ee-${ewok.version}.zip"/>
     </target>
 
 
@@ -46,6 +48,7 @@
                 <include name="pentaho-solutions/system/reporting"/>
                 <include name="pentaho-solutions/system/common-ui"/>
                 <include name="pentaho-solutions/system/pentaho-interactive-reporting"/>
+                <include name="pentaho-solutions/system/dashboards"/>
                 <include
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
                 <include
@@ -73,6 +76,7 @@
                 <include name="pentaho-reporting-engine-classic-core-platform-plugin-package-${ewok.version}.zip"/>
                 <include name="pir-plugin-ee-${ewok.version}-dev.zip"/>
                 <include name="common-ui-${ewok.version}.zip"/>
+                <include name="pdd-plugin-ee-${ewok.version}.zip"/>
             </fileset>
         </unzip>
         <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/">
