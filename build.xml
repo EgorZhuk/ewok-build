@@ -1,4 +1,4 @@
-<project name="Ewoks" basedir="." default="ewok">
+<project name="Ewoks" basedir="." default="debug">
 
     <property file="build.properties"/>
 
@@ -6,83 +6,7 @@
 
     <target name="clean">
         <delete dir="${ewok.basedir}"/>
-    </target>
-
-    <target name="resolve"
-            description="Removes old and downloads latest core, reporting plugin, pir, common-ui">
         <mkdir dir="${ewok.basedir}/"/>
-        <delete>
-            <fileset dir="${ewok.basedir}/">
-                <include name="pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
-                <include name="pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
-                <include name="pentaho-reporting-engine-classic-core-platform-plugin-package-${ewok.version}.zip"/>
-                <include name="pir-plugin-ee-${ewok.version}-dev.zip"/>
-                <include name="common-ui-${ewok.version}.zip"/>
-                <include name="pentaho-user-console-package-${ewok.version}.zip"/>
-            </fileset>
-        </delete>
-        <get src="${ewok.reporting.core.jar.url}" description="Reporting core jar"
-             dest="${ewok.basedir}/pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
-        <get src="${ewok.reporting-plugin.jar.url}" description="Reporting plugin jar"
-             dest="${ewok.basedir}/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
-        <get src="${ewok.reporting-plugin.zip.url}" description="Reporting plugin zip"
-             dest="${ewok.basedir}/pentaho-reporting-engine-classic-core-platform-plugin-package-${ewok.version}.zip"/>
-        <get src="${ewok.interactive-reporting-plugin.zip.url}" description="Interactive reporting plugin zip"
-             dest="${ewok.basedir}/pir-plugin-ee-${ewok.version}-dev.zip"/>
-        <get src="${ewok.common-ui-plugin.zip.url}" description="Common ui zip"
-             dest="${ewok.basedir}/common-ui-${ewok.version}.zip"/>
-        <get src="${ewok.puc.zip.url}" description="PUC zip"
-             dest="${ewok.basedir}/pentaho-user-console-package-${ewok.version}.zip"/>
-        <get src="${ewok.dd.zip.url}" description="Dashboard zip"
-             dest="${ewok.basedir}/pdd-plugin-ee-${ewok.version}.zip"/>
-    </target>
-
-
-    <target name="build" description="Puts libraries in platform zip">
-        <!--BI server-->
-
-        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
-        <echo message="Deleting old jars and plugins"/>
-        <delete>
-            <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
-                <include name="pentaho-solutions/system/reporting"/>
-                <include name="pentaho-solutions/system/common-ui"/>
-                <include name="pentaho-solutions/system/pentaho-interactive-reporting"/>
-                <include name="pentaho-solutions/system/dashboards"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/mantle/"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/deploy/"/>
-            </fileset>
-        </delete>
-        <echo message="Copying jars"/>
-        <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
-            <fileset dir="${ewok.basedir}/">
-                <include name="pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
-                <include name="pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
-            </fileset>
-        </copy>
-        <echo message="Unzipping plugins"/>
-        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
-            <fileset dir="${ewok.basedir}/">
-                <include name="pentaho-reporting-engine-classic-core-platform-plugin-package-${ewok.version}.zip"/>
-                <include name="pir-plugin-ee-${ewok.version}-dev.zip"/>
-                <include name="common-ui-${ewok.version}.zip"/>
-                <include name="pdd-plugin-ee-${ewok.version}.zip"/>
-            </fileset>
-        </unzip>
-        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/">
-            <file name="${ewok.basedir}/pentaho-user-console-package-${ewok.version}.zip"/>
-        </unzip>
-        <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
     </target>
 
     <target name="copy-platform">
@@ -95,42 +19,28 @@
         <delete>
             <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
                 <include name="pentaho-solutions/system/reporting"/>
-                <include name="pentaho-solutions/system/common-ui"/>
                 <include name="pentaho-solutions/system/pentaho-interactive-reporting"/>
                 <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
-                <include
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${ewok.version}.jar"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
             </fileset>
         </delete>
         <echo message="Copying jars"/>
         <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
-            <file name="${ewok.reporting.core.jar}"/>
             <file name="${ewok.reporting-plugin.jar}"/>
         </copy>
         <echo message="Unzipping plugins"/>
         <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
             <file name="${ewok.reporting-plugin.zip}"/>
             <file name="${ewok.interactive-reporting-plugin.zip}"/>
-            <file name="${ewok.common-ui-plugin.zip}"/>
         </unzip>
-        <delete file="${ewok.basedir}/biserver-ee-${ewok.version}.zip"/>
     </target>
 
     <target name="puc">
         <delete>
             <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
                 <include name="pentaho-solutions/system/reporting"/>
-
                 <include
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
-
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${ewok.version}.jar"/>
             </fileset>
         </delete>
         <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
@@ -141,16 +51,18 @@
         </unzip>
     </target>
 
-    <target name="ewok" depends="clean, resolve, build"
-            description="Downloads libraries, unzips platform and puts libraries in"/>
-
-    <target name="ewok-local" depends="clean, copy-platform, build-local"
-            description="Downloads libraries, unzips platform and puts libraries in"/>
+    <target name="ewok-local" depends="clean, copy-platform, build-local"/>
 
     <target name="debug">
         <exec executable="cmd">
             <arg value="/c"/>
             <arg value="${ewok.basedir}/biserver-ee/biserver-ee/start-pentaho-debug.bat"/>
+        </exec>
+    </target>
+
+    <target name="update">
+        <exec executable="bash">
+            <arg value="good_morning.sh"/>
         </exec>
     </target>
 </project>
