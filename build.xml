@@ -2,67 +2,115 @@
 
     <property file="build.properties"/>
 
-    <property name="ewok.basedir" value="${basedir}/dist/ewok"/>
-
     <target name="clean">
         <delete dir="${ewok.basedir}"/>
         <mkdir dir="${ewok.basedir}/"/>
     </target>
 
-    <target name="copy-platform">
-        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/biserver-ee"/>
+    <target name="platform">
+        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/pentaho-server-ee"/>
     </target>
 
-    <target name="build-local" description="Puts libraries in platform zip">
-        <!--BI server-->
-        <echo message="Deleting old jars and plugins"/>
+    <target name="reporting">
         <delete>
-            <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
-                <include name="pentaho-solutions/system/reporting"/>
-                <include name="pentaho-solutions/system/pentaho-interactive-reporting"/>
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
                 <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
+                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
             </fileset>
         </delete>
-        <echo message="Copying jars"/>
-        <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
-            <file name="${ewok.reporting-plugin.jar}"/>
+        <copy todir="${ewok.basedir}/pentaho-server-ee/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/">
+            <file name="${ewok.reporting.jar}"/>
         </copy>
-        <echo message="Unzipping plugins"/>
-        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
-            <file name="${ewok.reporting-plugin.zip}"/>
-            <file name="${ewok.interactive-reporting-plugin.zip}"/>
-        </unzip>
     </target>
 
     <target name="puc">
         <delete>
-            <fileset dir="${ewok.basedir}/biserver-ee/biserver-ee/">
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
                 <include name="pentaho-solutions/system/reporting"/>
                 <include
                         name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
             </fileset>
         </delete>
-        <copy todir="${ewok.basedir}/biserver-ee/biserver-ee/tomcat/webapps/pentaho/WEB-INF/lib/">
+        <copy todir="${ewok.basedir}/pentaho-server-ee/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/">
             <file name="${ewok.reporting-plugin.jar}"/>
         </copy>
-        <unzip dest="${ewok.basedir}/biserver-ee/biserver-ee/pentaho-solutions/system/">
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/">
             <file name="${ewok.reporting-plugin.zip}"/>
         </unzip>
     </target>
 
-    <target name="ewok-local" depends="clean, copy-platform, build-local"/>
+    <target name="pir">
+        <delete>
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
+                <include name="pentaho-solutions/system/interactive-reporting"/>
+            </fileset>
+        </delete>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/">
+            <file name="${ewok.interactive-reporting-plugin.zip}"/>
+        </unzip>
+    </target>
+
+    <target name="common-ui">
+        <delete>
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
+                <include name="pentaho-solutions/system/common-ui"/>
+            </fileset>
+        </delete>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/">
+            <file name="${common-ui}"/>
+        </unzip>
+    </target>
+
+    <target name="dd">
+        <delete>
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
+                <include name="pentaho-solutions/system/dashboards"/>
+            </fileset>
+        </delete>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/">
+            <file name="${ewok.dd-plugin.zip}"/>
+        </unzip>
+    </target>
+
+    <target name="gwt">
+        <delete>
+            <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
+                <include name="tomcat/webapps/pentaho/mantle"/>
+                <include name="tomcat/webapps/pentaho/mantle/WEB-INF/deploy"/>
+            </fileset>
+        </delete>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/tomcat/webapps/pentaho/">
+            <file name="${ewok.user-console.zip}"/>
+        </unzip>
+    </target>
+
+    <target name="replace-local" depends="reporting, puc, pir, dd"/>
+
+    <target name="ewok-local" depends="clean, platform, replace-local"/>
 
     <target name="debug">
         <exec executable="cmd">
             <arg value="/c"/>
-            <arg value="${ewok.basedir}/biserver-ee/biserver-ee/start-pentaho-debug.bat"/>
+            <arg value="${ewok.basedir}/pentaho-server-ee/pentaho-server/start-pentaho-debug.bat"/>
+        </exec>
+    </target>
+
+    <target name="run">
+        <exec executable="cmd">
+            <arg value="/c"/>
+            <arg value="${ewok.basedir}/pentaho-server-ee/pentaho-server/start-pentaho.bat"/>
         </exec>
     </target>
 
     <target name="update">
         <exec executable="bash">
             <arg value="good_morning.sh"/>
+        </exec>
+    </target>
+
+     <target name="cleanup">
+        <exec executable="bash">
+            <arg value="cleanup.sh"/>
         </exec>
     </target>
 </project>
