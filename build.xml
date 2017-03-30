@@ -1,34 +1,33 @@
-<project name="Ewoks" basedir="." default="debug">
-
+<project basedir="." default="debug" name="Ewoks">
     <property file="build.properties"/>
-
     <target name="clean">
-        <delete dir="${ewok.basedir}"/>
-        <mkdir dir="${ewok.basedir}/"/>
+        <delete>
+            <fileset dir="${ewok.basedir}" includes="**"/>
+        </delete>
     </target>
-
     <target name="platform">
-        <unzip src="${ewok.bi-server-ee.zip.location}" dest="${ewok.basedir}/pentaho-server-ee"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee" src="${ewok.bi-server-ee.zip.location}"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/" src="${servers.basedir}/pad-ee-7.1-QAT-${latest}.zip"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/" src="${servers.basedir}/paz-plugin-ee-7.1-QAT-${latest}.zip"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/" src="${servers.basedir}/pdd-plugin-ee-7.1-QAT-${latest}.zip"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/" src="${servers.basedir}/pentaho-analysis-ee-7.1-QAT-${latest}.zip"/>
+        <unzip dest="${ewok.basedir}/pentaho-server-ee/pentaho-server/pentaho-solutions/system/" src="${servers.basedir}/pir-plugin-ee-7.1-QAT-${latest}.zip"/>
     </target>
-
     <target name="reporting">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-${dependency.bi-platform.revision}.jar"/>
+                <include name="tomcat/webapps/pentaho/WEB-INF/lib/classic-core-${dependency.bi-platform.revision}.jar"/>
             </fileset>
         </delete>
         <copy todir="${ewok.basedir}/pentaho-server-ee/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/">
             <file name="${ewok.reporting.jar}"/>
         </copy>
     </target>
-
     <target name="puc">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
                 <include name="pentaho-solutions/system/reporting"/>
-                <include
-                        name="tomcat/webapps/pentaho/WEB-INF/lib/pentaho-reporting-engine-classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
+                <include name="tomcat/webapps/pentaho/WEB-INF/lib/classic-core-platform-plugin-${dependency.bi-platform.revision}.jar"/>
             </fileset>
         </delete>
         <copy todir="${ewok.basedir}/pentaho-server-ee/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/">
@@ -38,7 +37,6 @@
             <file name="${ewok.reporting-plugin.zip}"/>
         </unzip>
     </target>
-
     <target name="pir">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
@@ -49,7 +47,6 @@
             <file name="${ewok.interactive-reporting-plugin.zip}"/>
         </unzip>
     </target>
-
     <target name="common-ui">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
@@ -60,7 +57,6 @@
             <file name="${common-ui}"/>
         </unzip>
     </target>
-
     <target name="dd">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
@@ -71,7 +67,6 @@
             <file name="${ewok.dd-plugin.zip}"/>
         </unzip>
     </target>
-
     <target name="gwt">
         <delete>
             <fileset dir="${ewok.basedir}/pentaho-server-ee/pentaho-server/">
@@ -83,34 +78,43 @@
             <file name="${ewok.user-console.zip}"/>
         </unzip>
     </target>
-
-    <target name="replace-local" depends="reporting, puc, pir, dd"/>
-
-    <target name="ewok-local" depends="clean, platform, replace-local"/>
-
+    <target depends="reporting, puc, pir, dd" name="replace-local"/>
+    <target depends="clean, platform, replace-local" name="ewok-local"/>
     <target name="debug">
         <exec executable="cmd">
             <arg value="/c"/>
             <arg value="${ewok.basedir}/pentaho-server-ee/pentaho-server/start-pentaho-debug.bat"/>
         </exec>
     </target>
-
     <target name="run">
         <exec executable="cmd">
             <arg value="/c"/>
             <arg value="${ewok.basedir}/pentaho-server-ee/pentaho-server/start-pentaho.bat"/>
         </exec>
     </target>
-
     <target name="update">
         <exec executable="bash">
             <arg value="good_morning.sh"/>
         </exec>
     </target>
-
-     <target name="cleanup">
+    <target name="cleanup">
         <exec executable="bash">
             <arg value="cleanup.sh"/>
         </exec>
+    </target>
+    <target name="latest">
+        <exec executable="bash">
+            <arg value="latest.sh"/>
+        </exec>
+    </target>
+    <target depends="latest" name="gents">
+        <get dest="${servers.basedir}">
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/pad-ee-7.1-QAT-${latest}.zip"/>
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/paz-plugin-ee-7.1-QAT-${latest}.zip"/>
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/pdd-plugin-ee-7.1-QAT-${latest}.zip"/>
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/pentaho-analysis-ee-7.1-QAT-${latest}.zip"/>
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/pir-plugin-ee-7.1-QAT-${latest}.zip"/>
+            <url url="http://builds.pentaho.com/hosted/7.1-QAT/${latest}/pentaho-server-ee-7.1-QAT-${latest}.zip"/>
+        </get>
     </target>
 </project>
